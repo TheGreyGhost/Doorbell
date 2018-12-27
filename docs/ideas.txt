@@ -1,0 +1,7 @@
+- wav files
+- mono
+-one for doorbell interior, the other for visitor
+- randomly choose one from the data directory; look for matches *.wav
+- two channels; stereo mode; first one fully left, second one fully right
+- wait for button press, start tapedeck, play sound, stop
+- if button pressed again, restart immediately
