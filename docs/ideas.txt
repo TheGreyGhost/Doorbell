@@ -5,3 +5,11 @@
 - two channels; stereo mode; first one fully left, second one fully right
 - wait for button press, start tapedeck, play sound, stop
 - if button pressed again, restart immediately
+
+
+order:
+ random
+ sequential (saves current index to disk in case of power failure)
+ playlist (halloween, xmas, etc)
+
+ put a time limit on there to prevent out of hours playing
