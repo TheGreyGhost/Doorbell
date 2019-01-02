@@ -34,27 +34,27 @@ def initialise(loggername="default", path=DEBUG_DEFAULT_LOG_PATH, level=logging.
     logger.addHandler(ch)
 
 
-def loginfo(msg):
+def loginfo(msg, *args, **kwargs):
     global logger
-    logger.info(msg)
+    logger.info(msg, *args, **kwargs)
 
 
-def logerror(msg):
+def logerror(msg, *args, **kwargs):
     global logger
-    logger.error(msg)
+    logger.error(msg, *args, **kwargs)
 
 
-def logwarn(msg):
+def logwarn(msg, *args, **kwargs):
     global logger
-    logger.warn(msg)
+    logger.warn(msg, *args, **kwargs)
 
 
-def logdebug(msg):
+def logdebug(msg, *args, **kwargs):
     global logger
-    logger.debug(msg)
+    logger.debug(msg, *args, **kwargs)
 
-def exception():
-    logger.exception()
+def exception(msg, *args, **kwargs):
+    logger.exception(msg, *args, **kwargs)
 
 """
 class DatabaseError(RuntimeError):

@@ -12,9 +12,9 @@ if __name__ == '__main__':
     parser.add_argument("-il", "--indoorleftchannel",
                         help="left channel is used for indoor sound (else right channel used)", action="store_true")
     parser.add_argument("-i", "--indoorsound", help="path to indoor sound effect file", default="indoorsound")
-    parser.add_argument("-d", "--outdoorsounds", help="path to outdoor sound effects folder ", default="outdoorsounds")
+    parser.add_argument("-o", "--outdoorsounds", help="path to outdoor sound effects folder ", default="outdoorsounds")
     parser.add_argument("-t", "--testsound", help="play this sound continuously, if provided", default="")
-    parser.add_argument("")
+#    parser.add_argument("")
     args = parser.parse_args()
 
     errorhandler.initialise("doorbell", DEBUG_LOG_PATH, logging.DEBUG if args.debug else logging.INFO)

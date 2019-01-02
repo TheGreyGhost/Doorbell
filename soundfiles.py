@@ -59,8 +59,8 @@ class SoundFiles:
     indoor_channel = None           # mixer channel for indoor sounds
     outdoor_channel = None          # mixer channel for outdoor sounds
 
-    indoor_stereo_output_channel = StereoOutputChannel.left    # which speaker(s) is the indoor sound played on?
-    outdoor_stereo_output_channel = StereoOutputChannel.right   # which speaker(s) is the outdoor sound played on?
+    indoor_stereo_output_channel = StereoOutputChannel.LEFT    # which speaker(s) is the indoor sound played on?
+    outdoor_stereo_output_channel = StereoOutputChannel.RIGHT   # which speaker(s) is the outdoor sound played on?
 
     def __init__(self, indoorsoundfile, outdoorsoundsfolder, indoorstereooutputchannel, outdoorstereooutputchannel):
         """
