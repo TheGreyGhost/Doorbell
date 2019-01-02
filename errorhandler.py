@@ -53,6 +53,9 @@ def logdebug(msg):
     global logger
     logger.debug(msg)
 
+def exception():
+    logger.exception()
+
 """
 class DatabaseError(RuntimeError):
     def __init__(self, arg):

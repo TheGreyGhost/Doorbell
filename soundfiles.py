@@ -1,5 +1,6 @@
 import pygame
 import random
+import errorhandler
 from enum import Enum
 from pathlib import Path
 
@@ -69,10 +70,14 @@ class SoundFiles:
         """
         self.indoor_file = Path(indoorsoundfile)
         self.outdoor_folder = Path(outdoorsoundsfolder)
+        errorhandler.logdebug("SoundFiles::__init__")
+        errorhandler.loginfo("indoor_File: {}".format(self.indoor_file))
+        errorhandler.loginfo("outdoor_folder: {}".format(self.outdoor_folder))
+
         if not self.indoor_file.is_file():
-            raise ValueError("Indoor sound file not found:{}".format(indoorsoundfile))
+            raise ValueError("Indoor sound file not found or is not a file:{}".format(indoorsoundfile))
         if not self.outdoor_folder.is_dir():
-            raise ValueError("Outdoor sounds folder not found:{}".format(outdoorsoundsfolder))
+            raise ValueError("Outdoor sounds folder not found or is not a folder:{}".format(outdoorsoundsfolder))
 
         self.indoor_stereo_output_channel = indoorstereooutputchannel
         self.outdoor_stereo_output_channel = outdoorstereooutputchannel
@@ -88,26 +93,35 @@ class SoundFiles:
         pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=65536)
         pygame.mixer.set_num_channels(2)
         pygame.mixer.set_reserved(2)
+        errorhandler.logdebug("SoundFiles::initialiseMixer")
 
     def refreshIndoor(self):
+        errorhandler.logdebug("SoundFiles::refreshIndoor")
         self.indoor_channel = pygame.mixer.Channel(self.INDOOR_CHANNEL_ID)
         self.indoor_sound = pygame.mixer.Sound(self.indoor_file)
 
     def refreshOutdoor(self):
-        self.outdoor_channel = pygame.mixer.Channel(self.OUDOOR_CHANNEL_ID)
+        errorhandler.logdebug("SoundFiles::refreshOutdoor")
+        self.outdoor_channel = pygame.mixer.Channel(self.OUTDOOR_CHANNEL_ID)
         self.outdoor_files = self.outdoor_folder.glob("*.wav")
+        errorhandler.loginfo("outdoor files found:{}".format(self.outdoor_files))
+
         self.next_outdoor_sound_index = 0
         self.selectNextOutdoor(SelectionMethod.SEQUENTIAL)
 
     def selectNextOutdoor(self, selection_method):
+        errorhandler.logdebug("SoundFiles::selectNextOutdoor")
+        errorhandler.logdebug("selection_method:{}".format(selection_method))
         if selection_method == SelectionMethod.RANDOM:
             self.outdoor_file = random.choice(self.outdoor_files)
         elif selection_method == SelectionMethod.SEQUENTIAL:
+            errorhandler.logdebug("outdoor_sound_index:{}".format(self.next_outdoor_sound_index))
             self.outdoor_file = self.outdoor_files[self.next_outdoor_sound_index]
             self.next_outdoor_sound_index += 1
             if self.next_outdoor_sound_index >= self.outdoor_files.len():
                 self.next_outdoor_sound_index = 0
 
+        errorhandler.loginfo("outdoor files selected:{}".format(self.outdoor_file))
         self.outdoor_sound = pygame.mixer.Sound(self.outdoor_file)
 
 
@@ -115,11 +129,13 @@ class SoundFiles:
         self.indoorchannel.play(self.indoor_sound, loops=0, maxtime=0, fade_ms=0)
         self.indoor_channel.set_volume(self.indoor_stereo_output_channel.leftChannelVolume,
                                        self.indoor_stereo_output_channel.rightChannelVolume)
+        errorhandler.logdebug("SoundFiles::playIndoor")
 
     def playOutdoor(self):
         self.outdoor_channel.play(self.outdoor_sound, loops=0, maxtime=0, fade_ms=0)
         self.outdoor_channel.set_volume(self.outdoor_stereo_output_channel.leftChannelVolume,
                                         self.outdoor_stereo_output_channel.rightChannelVolume)
+        errorhandler.logdebug("SoundFiles::playOutdoor")
 
     def play(self):
         self.playIndoor()

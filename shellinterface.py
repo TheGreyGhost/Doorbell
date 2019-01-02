@@ -1,6 +1,8 @@
 import argparse
 import errorhandler
 import logging
+from soundfiles import SoundFiles
+from soundfiles import StereoOutputChannel
 
 DEBUG_LOG_PATH = r"/var/tap/doorbelllog.txt"
 
@@ -10,7 +12,7 @@ if __name__ == '__main__':
     parser.add_argument("-il", "--indoorleftchannel",
                         help="left channel is used for indoor sound (else right channel used)", action="store_true")
     parser.add_argument("-i", "--indoorsound", help="path to indoor sound effect file", default="indoorsound")
-    parser.add_argument("-d", "--outdoorsounds", help="path to outdoor sound effects folder ", default="")
+    parser.add_argument("-d", "--outdoorsounds", help="path to outdoor sound effects folder ", default="outdoorsounds")
     parser.add_argument("-t", "--testsound", help="play this sound continuously, if provided", default="")
     parser.add_argument("")
     args = parser.parse_args()
@@ -20,10 +22,25 @@ if __name__ == '__main__':
     errorhandler.logdebug("Arguments provided:")
     errorhandler.logdebug(args)
 
+    try:
+        sound_files = SoundFiles(args.indoorsoundfile, args.outdoorsoundsfolder,
+                                 indoorstereooutputchannel=(StereoOutputChannel.LEFT if args.indoorleftchannel else StereoOutputChannel.RIGHT),
+                                 outdoorstereooutputchannel=(StereoOutputChannel.RIGHT if args.indoorleftchannel else StereoOutputChannel.LEFT))
+        sound_files.play()
+    except IOError as e:
+        errorhandler.logwarn("I/O error occurred ({0}): {1}".format(e.errno, e.strerror))
+    except ValueError as e:
+        errorhandler.logerror("Invalid value provided ({0}): {1}".format(e.errno, e.strerror))
+    except:
+        errorhandler.exception()
+        raise
+
+"""
     with DBaccess(host=args.host, port=args.port, dbname=args.databasename,
                   username=args.username, dbpassword=args.password) as db:
         ebtables = EbTables(db)
         eblist = ebtables.completeupdate(args.atomiccommitfilename)
+"""
 
 """
     if args.debug:
