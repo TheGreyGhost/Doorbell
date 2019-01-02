@@ -71,7 +71,7 @@ class SoundFiles:
         self.indoor_file = Path(indoorsoundfile)
         self.outdoor_folder = Path(outdoorsoundsfolder)
         errorhandler.logdebug("SoundFiles::__init__")
-        errorhandler.loginfo("indoor_File: {}".format(self.indoor_file))
+        errorhandler.loginfo("indoor_file: {}".format(self.indoor_file))
         errorhandler.loginfo("outdoor_folder: {}".format(self.outdoor_folder))
 
         if not self.indoor_file.is_file():
@@ -98,7 +98,7 @@ class SoundFiles:
     def refreshIndoor(self):
         errorhandler.logdebug("SoundFiles::refreshIndoor")
         self.indoor_channel = pygame.mixer.Channel(self.INDOOR_CHANNEL_ID)
-        self.indoor_sound = pygame.mixer.Sound(self.indoor_file)
+        self.indoor_sound = pygame.mixer.Sound(str(self.indoor_file))
 
     def refreshOutdoor(self):
         errorhandler.logdebug("SoundFiles::refreshOutdoor")
@@ -122,7 +122,7 @@ class SoundFiles:
                 self.next_outdoor_sound_index = 0
 
         errorhandler.loginfo("outdoor files selected:{}".format(self.outdoor_file))
-        self.outdoor_sound = pygame.mixer.Sound(self.outdoor_file)
+        self.outdoor_sound = pygame.mixer.Sound(str(self.outdoor_file))
 
 
     def playIndoor(self):

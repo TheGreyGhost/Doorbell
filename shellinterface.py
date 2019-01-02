@@ -7,12 +7,12 @@ from soundfiles import StereoOutputChannel
 DEBUG_LOG_PATH = r"/var/tap/doorbelllog.txt"
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(epilog="All sound files should be 16 bit 44.1 kHz mono .wav")
+    parser = argparse.ArgumentParser(epilog="All sound files should be 16 bit 44.1 kHz mono .wav.  Errors written to logfile at {}".format(DEBUG_LOG_PATH))
     parser.add_argument("-d", "--debug", help="print debugging information", action="store_true")
     parser.add_argument("-il", "--indoorleftchannel",
                         help="left channel is used for indoor sound (else right channel used)", action="store_true")
-    parser.add_argument("-i", "--indoorsound", help="path to indoor sound effect file", default="indoorsound")
-    parser.add_argument("-o", "--outdoorsounds", help="path to outdoor sound effects folder ", default="outdoorsounds")
+    parser.add_argument("-i", "--indoorsoundfile", help="path to indoor sound effect file", default="indoorsound")
+    parser.add_argument("-o", "--outdoorsoundsfolder", help="path to outdoor sound effects folder ", default="outdoorsounds")
     parser.add_argument("-t", "--testsound", help="play this sound continuously, if provided", default="")
 #    parser.add_argument("")
     args = parser.parse_args()
@@ -30,9 +30,9 @@ if __name__ == '__main__':
     except IOError as e:
         errorhandler.logwarn("I/O error occurred ({0}): {1}".format(e.errno, e.strerror))
     except ValueError as e:
-        errorhandler.logerror("Invalid value provided ({0}): {1}".format(e.errno, e.strerror))
+        errorhandler.logerror(repr(e))
     except:
-        errorhandler.exception()
+        errorhandler.exception("Caught exception in shellinterface")
         raise
 
 """
