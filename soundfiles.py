@@ -50,6 +50,7 @@ class SoundFiles:
     outdoor_files = None            # collection of Paths, one for each outdoor sound file (*.wav)
     outdoor_file = None             # Path to the next outdoor sound file to be played(*.wav)
     next_outdoor_sound_index = 0    # for sequential playing: the index of the sound that will be selected next
+    outdoor_unused = False          # if true; the outdoor sound is unused
 
     indoor_sound = None             # Sound object for the indoor sound
     outdoor_sound = None            # Sound object for the outdoor sound to be played
@@ -67,17 +68,22 @@ class SoundFiles:
         define the location of the the sound files
         :param indoorsoundfile: string giving the path to the sound file used for indoor speakers
         :param outdoorsoundsfolder: string giving the path of the folder which contains sound files for outdoor speakers
+                                    if None, ignore
         """
         self.indoor_file = Path(indoorsoundfile)
-        self.outdoor_folder = Path(outdoorsoundsfolder)
+        self.outdoor_unused = (outdoorsoundsfolder is None)
+
+        if not self.outdoor_unused:
+            self.outdoor_folder = Path(outdoorsoundsfolder)
         errorhandler.logdebug("SoundFiles::__init__")
         errorhandler.loginfo("indoor_file: {}".format(self.indoor_file))
         errorhandler.loginfo("outdoor_folder: {}".format(self.outdoor_folder))
 
         if not self.indoor_file.is_file():
             raise ValueError("Indoor sound file not found or is not a file:{}".format(indoorsoundfile))
-        if not self.outdoor_folder.is_dir():
-            raise ValueError("Outdoor sounds folder not found or is not a folder:{}".format(outdoorsoundsfolder))
+        if not self.outdoor_unused:
+            if not self.outdoor_folder.is_dir():
+                raise ValueError("Outdoor sounds folder not found or is not a folder:{}".format(outdoorsoundsfolder))
 
         self.indoor_stereo_output_channel = indoorstereooutputchannel
         self.outdoor_stereo_output_channel = outdoorstereooutputchannel
@@ -102,6 +108,8 @@ class SoundFiles:
 
     def refreshOutdoor(self):
         errorhandler.logdebug("SoundFiles::refreshOutdoor")
+        if self.outdoor_unused:
+            return
         self.outdoor_channel = pygame.mixer.Channel(self.OUTDOOR_CHANNEL_ID)
         self.outdoor_files = list(self.outdoor_folder.glob("*.wav"))
         errorhandler.loginfo("outdoor files found:{}".format(self.outdoor_files))
@@ -111,6 +119,8 @@ class SoundFiles:
 
     def selectNextOutdoor(self, selection_method):
         errorhandler.logdebug("SoundFiles::selectNextOutdoor")
+        if self.outdoor_unused:
+            return
         errorhandler.logdebug("selection_method:{}".format(selection_method))
         if selection_method == SelectionMethod.RANDOM:
             self.outdoor_file = random.choice(self.outdoor_files)
@@ -132,6 +142,8 @@ class SoundFiles:
         errorhandler.logdebug("SoundFiles::playIndoor")
 
     def playOutdoor(self):
+        if self.outdoor_unused:
+            return
         self.outdoor_channel.play(self.outdoor_sound, loops=0, maxtime=0, fade_ms=0)
         self.outdoor_channel.set_volume(self.outdoor_stereo_output_channel.leftChannelVolume,
                                         self.outdoor_stereo_output_channel.rightChannelVolume)
@@ -142,7 +154,7 @@ class SoundFiles:
         self.playOutdoor()
 
     def isFinished(self):
-         return not (self.indoor_channel.get_busy() or self.indoor_channel.get_busy())
+        return (not self.indoor_channel.get_busy()) and (self.outdoor_unused or not self.outdoor_channel.get_busy())
 
 
 
