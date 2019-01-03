@@ -4,7 +4,7 @@ import errorhandler
 from enum import Enum
 from pathlib import Path
 
-SelectionMethod = Enum("RANDOM", "SEQUENTIAL")
+SelectionMethod = Enum("SelectionMethod", "RANDOM SEQUENTIAL")
 
 class StereoOutputChannel(Enum):
     LEFT =  (1.0, 0.0)
@@ -103,7 +103,7 @@ class SoundFiles:
     def refreshOutdoor(self):
         errorhandler.logdebug("SoundFiles::refreshOutdoor")
         self.outdoor_channel = pygame.mixer.Channel(self.OUTDOOR_CHANNEL_ID)
-        self.outdoor_files = self.outdoor_folder.glob("*.wav")
+        self.outdoor_files = list(self.outdoor_folder.glob("*.wav"))
         errorhandler.loginfo("outdoor files found:{}".format(self.outdoor_files))
 
         self.next_outdoor_sound_index = 0
@@ -118,7 +118,7 @@ class SoundFiles:
             errorhandler.logdebug("outdoor_sound_index:{}".format(self.next_outdoor_sound_index))
             self.outdoor_file = self.outdoor_files[self.next_outdoor_sound_index]
             self.next_outdoor_sound_index += 1
-            if self.next_outdoor_sound_index >= self.outdoor_files.len():
+            if self.next_outdoor_sound_index >= len(self.outdoor_files):
                 self.next_outdoor_sound_index = 0
 
         errorhandler.loginfo("outdoor files selected:{}".format(self.outdoor_file))
@@ -126,7 +126,7 @@ class SoundFiles:
 
 
     def playIndoor(self):
-        self.indoorchannel.play(self.indoor_sound, loops=0, maxtime=0, fade_ms=0)
+        self.indoor_channel.play(self.indoor_sound, loops=0, maxtime=0, fade_ms=0)
         self.indoor_channel.set_volume(self.indoor_stereo_output_channel.leftChannelVolume,
                                        self.indoor_stereo_output_channel.rightChannelVolume)
         errorhandler.logdebug("SoundFiles::playIndoor")

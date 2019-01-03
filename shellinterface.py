@@ -1,6 +1,7 @@
 import argparse
 import errorhandler
 import logging
+import time
 from soundfiles import SoundFiles
 from soundfiles import StereoOutputChannel
 
@@ -27,6 +28,12 @@ if __name__ == '__main__':
                                  indoorstereooutputchannel=(StereoOutputChannel.LEFT if args.indoorleftchannel else StereoOutputChannel.RIGHT),
                                  outdoorstereooutputchannel=(StereoOutputChannel.RIGHT if args.indoorleftchannel else StereoOutputChannel.LEFT))
         sound_files.play()
+
+        sleepcount = 10
+        while sleepcount > 0 and not sound_files.isFinished():
+            sleepcount -= 1
+            time.sleep(1)
+
     except IOError as e:
         errorhandler.logwarn("I/O error occurred ({0}): {1}".format(e.errno, e.strerror))
     except ValueError as e:
