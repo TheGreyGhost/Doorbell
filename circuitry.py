@@ -1,8 +1,8 @@
 from gpiozero import LED, Button
 import time
 
-doorbell_button = Button(pin=4, hold_time=0.1)  #Connect one side of the button to a ground pin, and the other to any GPIO pin.
-speakers_relay = LED(pin=17) # output is 0V or 3.3 V
+doorbell_button = Button(pin=17, hold_time=0.1)  #Connect one side of the button to a ground pin and the other to the pin
+speakers_relay = LED(pin=18)  # output is 0V or 3.3 V
 
 def waitForButtonPress():
     """
