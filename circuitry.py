@@ -11,12 +11,12 @@ def waitForButtonPress():
     """
     while (True):
         doorbell_button.wait_for_press()
-        while (doorbell_button.is_pressed()):
-            if doorbell_button.is_held():
+        while (doorbell_button.is_pressed):
+            if doorbell_button.is_held:
                 return
 
 def isButtonPressed():
-    return doorbell_button.is_pressed()
+    return doorbell_button.is_pressed
 
 def turnOnSpeakers():
     """
