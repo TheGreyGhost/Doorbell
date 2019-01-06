@@ -7,7 +7,7 @@ from pathlib import Path
 
 SelectionMethod = Enum("SelectionMethod", "RANDOM SEQUENTIAL")
 
-PERSISTENT_INDEX_SHELF = r"~pi/doorbell/savedstate.ini"
+PERSISTENT_INDEX_SHELF = r"/home/pi/doorbellsavedstate.ini"
 
 class StereoOutputChannel(Enum):
     LEFT =  (1.0, 0.0)
@@ -128,14 +128,14 @@ class SoundFiles:
         if selection_method == SelectionMethod.RANDOM:
             self.outdoor_file = random.choice(self.outdoor_files)
         elif selection_method == SelectionMethod.SEQUENTIAL:
-            errorhandler.logdebug("outdoor_sound_index:{}".format(self.next_outdoor_sound_index))
+#            errorhandler.logdebug("outdoor_sound_index:{}".format(self.next_outdoor_sound_index))
             with shelve.open(PERSISTENT_INDEX_SHELF) as db:
                 if "idx" in db:
                     self.next_outdoor_sound_index = db["idx"]
                     errorhandler.logdebug("retrieved {} from {}".format(db["idx"], PERSISTENT_INDEX_SHELF))
                 else:
                     self.next_outdoor_sound_index = 0
-                    errorhandler.logdebug("initialised idx to 0".format(db["idx"], PERSISTENT_INDEX_SHELF))
+                    errorhandler.logdebug("initialised idx to 0")
                 if self.next_outdoor_sound_index < 0 or self.next_outdoor_sound_index >= len(self.outdoor_files):
                     self.next_outdoor_sound_index = 0
                 self.outdoor_file = self.outdoor_files[self.next_outdoor_sound_index]
