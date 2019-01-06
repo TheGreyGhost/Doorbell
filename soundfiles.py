@@ -1,10 +1,13 @@
 import pygame
 import random
 import errorhandler
+import shelve
 from enum import Enum
 from pathlib import Path
 
 SelectionMethod = Enum("SelectionMethod", "RANDOM SEQUENTIAL")
+
+PERSISTENT_INDEX_SHELF = r"~pi/doorbell/savedstate.ini"
 
 class StereoOutputChannel(Enum):
     LEFT =  (1.0, 0.0)
@@ -114,7 +117,7 @@ class SoundFiles:
         self.outdoor_files = list(self.outdoor_folder.glob("*.wav"))
         errorhandler.loginfo("outdoor files found:{}".format(self.outdoor_files))
 
-        self.next_outdoor_sound_index = 0
+#        self.next_outdoor_sound_index = 0
         self.selectNextOutdoor(SelectionMethod.SEQUENTIAL)
 
     def selectNextOutdoor(self, selection_method):
@@ -126,10 +129,21 @@ class SoundFiles:
             self.outdoor_file = random.choice(self.outdoor_files)
         elif selection_method == SelectionMethod.SEQUENTIAL:
             errorhandler.logdebug("outdoor_sound_index:{}".format(self.next_outdoor_sound_index))
-            self.outdoor_file = self.outdoor_files[self.next_outdoor_sound_index]
-            self.next_outdoor_sound_index += 1
-            if self.next_outdoor_sound_index >= len(self.outdoor_files):
-                self.next_outdoor_sound_index = 0
+            with shelve.open(PERSISTENT_INDEX_SHELF) as db:
+                if "idx" in db:
+                    self.next_outdoor_sound_index = db["idx"]
+                    errorhandler.logdebug("retrieved {} from {}".format(db["idx"], PERSISTENT_INDEX_SHELF))
+                else:
+                    self.next_outdoor_sound_index = 0
+                    errorhandler.logdebug("initialised idx to 0".format(db["idx"], PERSISTENT_INDEX_SHELF))
+                if self.next_outdoor_sound_index < 0 or self.next_outdoor_sound_index >= len(self.outdoor_files):
+                    self.next_outdoor_sound_index = 0
+                self.outdoor_file = self.outdoor_files[self.next_outdoor_sound_index]
+                self.next_outdoor_sound_index += 1
+                if self.next_outdoor_sound_index >= len(self.outdoor_files):
+                    self.next_outdoor_sound_index = 0
+                db["idx"] = self.next_outdoor_sound_index
+                errorhandler.logdebug("stored {} in {}".format(db["idx"], PERSISTENT_INDEX_SHELF))
 
         errorhandler.loginfo("outdoor files selected:{}".format(self.outdoor_file))
         self.outdoor_sound = pygame.mixer.Sound(str(self.outdoor_file))
