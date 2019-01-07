@@ -2,6 +2,7 @@ import pygame
 import random
 import errorhandler
 import shelve
+import os
 from enum import Enum
 from pathlib import Path
 
@@ -73,6 +74,8 @@ class SoundFiles:
         :param outdoorsoundsfolder: string giving the path of the folder which contains sound files for outdoor speakers
                                     if None, ignore
         """
+
+        os.system("amixer sset PCM -- -20dB")
         self.indoor_file = Path(indoorsoundfile)
         self.outdoor_unused = (outdoorsoundsfolder is None)
 
@@ -116,8 +119,6 @@ class SoundFiles:
         self.outdoor_channel = pygame.mixer.Channel(self.OUTDOOR_CHANNEL_ID)
         self.outdoor_files = list(self.outdoor_folder.glob("*.wav"))
         errorhandler.loginfo("outdoor files found:{}".format(self.outdoor_files))
-
-#        self.next_outdoor_sound_index = 0
         self.selectNextOutdoor(SelectionMethod.SEQUENTIAL)
 
     def selectNextOutdoor(self, selection_method):
@@ -128,7 +129,6 @@ class SoundFiles:
         if selection_method == SelectionMethod.RANDOM:
             self.outdoor_file = random.choice(self.outdoor_files)
         elif selection_method == SelectionMethod.SEQUENTIAL:
-#            errorhandler.logdebug("outdoor_sound_index:{}".format(self.next_outdoor_sound_index))
             with shelve.open(PERSISTENT_INDEX_SHELF) as db:
                 if "idx" in db:
                     self.next_outdoor_sound_index = db["idx"]

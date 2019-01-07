@@ -13,6 +13,7 @@ def waitForButtonPress():
     Blinks the status led while waiting.
     :return:
     """
+    global button_has_been_released
     while (True):
         status_led.toggle()
         doorbell_button.wait_for_press(timeout=LED_BLINK_DELAY)
