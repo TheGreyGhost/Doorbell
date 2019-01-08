@@ -75,7 +75,7 @@ class SoundFiles:
                                     if None, ignore
         """
 
-        os.system("amixer sset PCM -- -20dB")
+        os.system("amixer sset PCM 0dB")  #("amixer sset PCM -- -20dB")
         self.indoor_file = Path(indoorsoundfile)
         self.outdoor_unused = (outdoorsoundsfolder is None)
 
