@@ -7,8 +7,8 @@ from soundfiles import SoundFiles
 from soundfiles import StereoOutputChannel
 from soundfiles import SelectionMethod
 
-DEBUG_LOG_PATH = r"/home/pi/doorbell.log"
-DEFAULT_TEST_SOUND = r"/home/pi/doorbell/data/testsound.wav"
+DEBUG_LOG_PATH = r"/home/doorbell/doorbell.log"
+DEFAULT_TEST_SOUND = r"/home/doorbell/doorbell/data/testsound.wav"
 
 def playTestSoundUntilButtonPressed(testsoundpath):
     errorhandler.loginfo("Playing test sound: {}".format(testsoundpath))
