@@ -4,7 +4,7 @@
 
  [Service]
  Type=idle
- ExecStart=/usr/bin/python3 /home/pi/doorbell/doorbell.py -i /home/pi/doorbell/data/indoor.wav -o /home/pi/doorbell/data/outdoorsounds --indoorleftchannel
+ ExecStart=/usr/bin/python3 /home/doorbell/doorbell/doorbell.py -i /home/pi/doorbell/data/indoor.wav -o /home/doorbell/doorbell/data/outdoorsounds --indoorleftchannel 
 
  [Install]
  WantedBy=multi-user.target
