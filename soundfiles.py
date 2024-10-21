@@ -8,7 +8,7 @@ from pathlib import Path
 
 SelectionMethod = Enum("SelectionMethod", "RANDOM SEQUENTIAL")
 
-PERSISTENT_INDEX_SHELF = r"/home/pi/doorbellsavedstate.ini"
+PERSISTENT_INDEX_SHELF = r"/home/doorbell/doorbellsavedstate.ini"
 
 class StereoOutputChannel(Enum):
     LEFT =  (1.0, 0.0)
