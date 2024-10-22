@@ -1,6 +1,6 @@
 from gpiozero import LED, Button
 import time
-import shutdownflag
+from shutdownflag import ShutdownFlag
 
 LED_BLINK_DELAY = 1.0   # blinks on and off at this rate; eg DELAY = 1.0 -> on for 1 s, off for 1 s, etc.
 BUTTON_HOLD_TIME = 0.1  # debounce for this length of time (s)

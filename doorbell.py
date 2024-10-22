@@ -3,7 +3,7 @@ import errorhandler
 import logging
 import time
 import circuitry
-import shutdownflag
+from shutdownflag import ShutdownFlag
 
 from soundfiles import SoundFiles
 from soundfiles import StereoOutputChannel
