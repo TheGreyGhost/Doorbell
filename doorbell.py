@@ -58,16 +58,17 @@ if __name__ == '__main__':
                                  outdoorstereooutputchannel=(StereoOutputChannel.RIGHT if args.indoorleftchannel else StereoOutputChannel.LEFT))
         while not shutdownTriggered.shutdown_triggered:
             circuitry.waitForButtonPress(shutdownTriggered)
-            circuitry.turnOnSpeakers()
-            sound_files.play()
-            errorhandler.logdebug("Waiting for sound to finish")
-            sleepcount = 60
-            while sleepcount > 0 and not sound_files.isFinished() and not shutdownTriggered.shutdown_triggered:
-                sleepcount -= 1
-                time.sleep(1)
-            errorhandler.logdebug("Stopped waiting, finished:{}".format(sound_files.isFinished()))
-            sound_files.selectNextOutdoor(SelectionMethod.SEQUENTIAL)
-            circuitry.turnOffSpeakers()
+            if not shutdownTriggered.shutdown_triggered:
+                circuitry.turnOnSpeakers()
+                sound_files.play()
+                errorhandler.logdebug("Waiting for sound to finish")
+                sleepcount = 60
+                while sleepcount > 0 and not sound_files.isFinished() and not shutdownTriggered.shutdown_triggered:
+                    sleepcount -= 1
+                    time.sleep(1)
+                errorhandler.logdebug("Stopped waiting, finished:{}".format(sound_files.isFinished()))
+                sound_files.selectNextOutdoor(SelectionMethod.SEQUENTIAL)
+                circuitry.turnOffSpeakers()
         if shutdownTriggered.shutdown_triggered:
             errorhandler.loginfo('SIGTERM received...')    
     except IOError as e:
