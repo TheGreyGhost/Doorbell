@@ -3,7 +3,7 @@ import errorhandler
 import logging
 import time
 import circuitry
-import signal
+import shutdownflag
 
 from soundfiles import SoundFiles
 from soundfiles import StereoOutputChannel
@@ -12,28 +12,21 @@ from soundfiles import SelectionMethod
 DEBUG_LOG_PATH = r"/home/doorbell/doorbell.log"
 DEFAULT_TEST_SOUND = r"/home/doorbell/doorbell/data/testsound.wav"
 
-def playTestSoundUntilButtonPressed(testsoundpath):
+def playTestSoundUntilButtonPressed(shutdownTriggered : ShutdownFlag, testsoundpath):
     errorhandler.loginfo("Playing test sound: {}".format(testsoundpath))
     circuitry.turnOnSpeakers()
     circuitry.status_led.on()
-    while (True):
+    while not shutdownTriggered.shutdown_triggered:
         sound_files = SoundFiles(testsoundpath, None, StereoOutputChannel.BOTH, StereoOutputChannel.NONE)
         sound_files.play()
-        while not sound_files.isFinished():
+        while not sound_files.isFinished() and not shutdownTriggered.shutdown_triggered:
             time.sleep(1)
         if circuitry.isButtonPressed():
             circuitry.turnOffSpeakers()
             errorhandler.loginfo("Stopped test sound.")
             return
 
-def _handle_sigterm(self, sig, frame):
-    errorhandler.loginfo('SIGTERM received...')
-    self.stop()
-
 if __name__ == '__main__':
-    signal.signal(signal.SIGINT, self._handle_sigterm)
-    signal.signal(signal.SIGTERM, self._handle_sigterm)
-    
     parser = argparse.ArgumentParser(
         epilog="All sound files should be 16 bit 44.1 kHz mono .wav."\
                " Hold button down during startup to start playing the test sound, press button again to stop."\
@@ -58,24 +51,25 @@ if __name__ == '__main__':
                 args.testsound = DEFAULT_TEST_SOUND
 
         if len(args.testsound) > 0:
-            playTestSoundUntilButtonPressed(args.testsound)
+            playTestSoundUntilButtonPressed(shutdownTriggered, args.testsound)
 
         sound_files = SoundFiles(args.indoorsoundfile, args.outdoorsoundsfolder,
                                  indoorstereooutputchannel=(StereoOutputChannel.LEFT if args.indoorleftchannel else StereoOutputChannel.RIGHT),
                                  outdoorstereooutputchannel=(StereoOutputChannel.RIGHT if args.indoorleftchannel else StereoOutputChannel.LEFT))
-        while not shutdownTriggered.shutdown_signal_received:
-            circuitry.waitForButtonPress()
+        while not shutdownTriggered.shutdown_triggered:
+            circuitry.waitForButtonPress(shutdownTriggered)
             circuitry.turnOnSpeakers()
             sound_files.play()
             errorhandler.logdebug("Waiting for sound to finish")
             sleepcount = 60
-            while sleepcount > 0 and not sound_files.isFinished():
+            while sleepcount > 0 and not sound_files.isFinished() and not shutdownTriggered.shutdown_triggered:
                 sleepcount -= 1
                 time.sleep(1)
             errorhandler.logdebug("Stopped waiting, finished:{}".format(sound_files.isFinished()))
             sound_files.selectNextOutdoor(SelectionMethod.SEQUENTIAL)
             circuitry.turnOffSpeakers()
-
+        if shutdownTriggered.shutdown_triggered:
+            errorhandler.loginfo('SIGTERM received...')    
     except IOError as e:
         errorhandler.logwarn("I/O error occurred ({0}): {1}".format(e.errno, e.strerror))
     except ValueError as e:
@@ -83,21 +77,3 @@ if __name__ == '__main__':
     except:
         errorhandler.exception("Caught exception in main")
         raise
-
-"""
-    with DBaccess(host=args.host, port=args.port, dbname=args.databasename,
-                  username=args.username, dbpassword=args.password) as db:
-        ebtables = EbTables(db)
-        eblist = ebtables.completeupdate(args.atomiccommitfilename)
-"""
-
-"""
-    if args.debug:
-#        print("wrote temp script to {}".format(DEBUG_LOG_PATH), file=sys.stderr)
-#        with open(DEBUG_LOG_PATH, "w+t") as f:
-            for singleline in eblist:
-                errorhandler.logdebug(singleline)
-
-    for singleline in eblist:
-        print(singleline)
-"""
