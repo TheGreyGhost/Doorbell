@@ -3,6 +3,8 @@ import errorhandler
 import logging
 import time
 import circuitry
+import signal
+
 from soundfiles import SoundFiles
 from soundfiles import StereoOutputChannel
 from soundfiles import SelectionMethod
@@ -24,7 +26,14 @@ def playTestSoundUntilButtonPressed(testsoundpath):
             errorhandler.loginfo("Stopped test sound.")
             return
 
+def _handle_sigterm(self, sig, frame):
+    errorhandler.loginfo('SIGTERM received...')
+    self.stop()
+
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, self._handle_sigterm)
+    signal.signal(signal.SIGTERM, self._handle_sigterm)
+    
     parser = argparse.ArgumentParser(
         epilog="All sound files should be 16 bit 44.1 kHz mono .wav."\
                " Hold button down during startup to start playing the test sound, press button again to stop."\
@@ -43,6 +52,7 @@ if __name__ == '__main__':
     errorhandler.logdebug(args)
 
     try:
+        shutdownTriggered = ShutdownFlag()
         if circuitry.isButtonPressed():
             if len(args.testsound) == 0:
                 args.testsound = DEFAULT_TEST_SOUND
@@ -53,7 +63,7 @@ if __name__ == '__main__':
         sound_files = SoundFiles(args.indoorsoundfile, args.outdoorsoundsfolder,
                                  indoorstereooutputchannel=(StereoOutputChannel.LEFT if args.indoorleftchannel else StereoOutputChannel.RIGHT),
                                  outdoorstereooutputchannel=(StereoOutputChannel.RIGHT if args.indoorleftchannel else StereoOutputChannel.LEFT))
-        while (True):
+        while not shutdownTriggered.shutdown_signal_received:
             circuitry.waitForButtonPress()
             circuitry.turnOnSpeakers()
             sound_files.play()
